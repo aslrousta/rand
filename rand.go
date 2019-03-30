@@ -2,6 +2,7 @@ package rand
 
 import (
 	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"strings"
 
@@ -13,6 +14,8 @@ type Charset int
 
 // List of charsets.
 const (
+	All = Uppercase | Lowercase | Digit
+
 	Uppercase = 1 << iota
 	Lowercase
 	Digit
@@ -30,6 +33,17 @@ func RandomBytes(n int) ([]byte, error) {
 	}
 
 	return data, nil
+}
+
+// RandomHex generates a random hexadecimal string.
+func RandomHex(n int) (string, error) {
+	bytes, err := RandomBytes((n + 1) / 2)
+	if err != nil {
+		return "", xerrors.Wrap(err, "random hex failed")
+	}
+
+	enc := hex.EncodeToString(bytes)
+	return enc[:n], nil
 }
 
 // RandomString generates a random string.
