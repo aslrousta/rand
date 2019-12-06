@@ -4,9 +4,8 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"strings"
-
-	xerrors "github.com/aslrousta/errors"
 )
 
 // Charset is the data type for random alphabet charset.
@@ -29,7 +28,7 @@ func RandomBytes(n int) ([]byte, error) {
 
 	data := make([]byte, n)
 	if _, err := rand.Read(data); err != nil {
-		return nil, xerrors.Wrap(err, "random bytes failed")
+		return nil, fmt.Errorf("random bytes failed: %v", err)
 	}
 
 	return data, nil
@@ -39,7 +38,7 @@ func RandomBytes(n int) ([]byte, error) {
 func RandomHex(n int) (string, error) {
 	bytes, err := RandomBytes((n + 1) / 2)
 	if err != nil {
-		return "", xerrors.Wrap(err, "random hex failed")
+		return "", fmt.Errorf("random hex failed: %v", err)
 	}
 
 	enc := hex.EncodeToString(bytes)
@@ -56,7 +55,7 @@ func RandomString(n int, charset Charset) (string, error) {
 
 	bytes, err := RandomBytes(n)
 	if err != nil {
-		return "", xerrors.Wrap(err, "random string failed")
+		return "", fmt.Errorf("random string failed: %v", err)
 	}
 
 	var sb strings.Builder
