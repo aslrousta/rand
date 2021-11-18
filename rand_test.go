@@ -21,13 +21,13 @@ var (
 )
 
 func TestRandomBytes(t *testing.T) {
-	check(t, nil, xrand.RandomBytes)
+	check(t, nil, xrand.Bytes)
 }
 
 func TestRandomString(t *testing.T) {
 	check(t, all,
 		func(n int) ([]byte, error) {
-			s, err := xrand.RandomString(n, xrand.All)
+			s, err := xrand.String(n, xrand.All)
 			if err != nil {
 				return nil, err
 			}
@@ -36,7 +36,7 @@ func TestRandomString(t *testing.T) {
 	)
 	check(t, uppercase,
 		func(n int) ([]byte, error) {
-			s, err := xrand.RandomString(n, xrand.Uppercase)
+			s, err := xrand.String(n, xrand.Uppercase)
 			if err != nil {
 				return nil, err
 			}
@@ -45,7 +45,7 @@ func TestRandomString(t *testing.T) {
 	)
 	check(t, lowercase,
 		func(n int) ([]byte, error) {
-			s, err := xrand.RandomString(n, xrand.Lowercase)
+			s, err := xrand.String(n, xrand.Lowercase)
 			if err != nil {
 				return nil, err
 			}
@@ -54,7 +54,7 @@ func TestRandomString(t *testing.T) {
 	)
 	check(t, digits,
 		func(n int) ([]byte, error) {
-			s, err := xrand.RandomString(n, xrand.Digit)
+			s, err := xrand.String(n, xrand.Digit)
 			if err != nil {
 				return nil, err
 			}
@@ -66,7 +66,7 @@ func TestRandomString(t *testing.T) {
 func TestRandomHex(t *testing.T) {
 	check(t, hex,
 		func(n int) ([]byte, error) {
-			s, err := xrand.RandomHex(n)
+			s, err := xrand.Hex(n)
 			if err != nil {
 				return nil, err
 			}
@@ -76,7 +76,6 @@ func TestRandomHex(t *testing.T) {
 }
 
 type genFunc func(int) ([]byte, error)
-
 type alphabet []byte
 
 func (alpha alphabet) Contains(b byte) bool {
@@ -108,14 +107,11 @@ func check(t *testing.T, alpha alphabet, g genFunc) {
 	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < maxIter; i++ {
 		n := min + rand.Intn(max-min)
-
 		bytes, err := g(n)
 		if err != nil {
 			t.Fatal(err)
 		}
-
 		Equal(t, len(bytes), n)
-
 		if alpha != nil {
 			for _, b := range bytes {
 				if !alpha.Contains(b) {

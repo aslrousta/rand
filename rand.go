@@ -20,55 +20,75 @@ const (
 	Digit
 )
 
-// RandomBytes generates a slice of random bytes.
-func RandomBytes(n int) ([]byte, error) {
+// Bytes generates a slice of random bytes.
+func Bytes(n int) ([]byte, error) {
 	if n < 1 {
 		return nil, errors.New("invalid random bytes length")
 	}
-
 	data := make([]byte, n)
 	if _, err := rand.Read(data); err != nil {
 		return nil, fmt.Errorf("random bytes failed: %v", err)
 	}
-
 	return data, nil
 }
 
-// RandomHex generates a random hexadecimal string.
-func RandomHex(n int) (string, error) {
-	bytes, err := RandomBytes((n + 1) / 2)
+// MustBytes generates a slice of random bytes, but panics on error.
+func MustBytes(n int) []byte {
+	bytes, err := Bytes(n)
+	if err != nil {
+		panic(err)
+	}
+	return bytes
+}
+
+// Hex generates a random hexadecimal string.
+func Hex(n int) (string, error) {
+	bytes, err := Bytes((n + 1) / 2)
 	if err != nil {
 		return "", fmt.Errorf("random hex failed: %v", err)
 	}
-
 	enc := hex.EncodeToString(bytes)
 	return enc[:n], nil
 }
 
-// RandomString generates a random string.
-func RandomString(n int, charset Charset) (string, error) {
+// MustHex generates a random hexadecimal string, but panics on error.
+func MustHex(n int) string {
+	hex, err := Hex(n)
+	if err != nil {
+		panic(err)
+	}
+	return hex
+}
+
+// String generates a random string.
+func String(n int, charset Charset) (string, error) {
 	alphabet := []byte(makeCharset(charset))
 	alphaLen := len(alphabet)
 	if alphaLen == 0 {
 		return "", errors.New("charset is empty")
 	}
-
-	bytes, err := RandomBytes(n)
+	bytes, err := Bytes(n)
 	if err != nil {
 		return "", fmt.Errorf("random string failed: %v", err)
 	}
-
 	var sb strings.Builder
 	for _, b := range bytes {
 		sb.WriteByte(alphabet[int(b)%alphaLen])
 	}
-
 	return sb.String(), nil
+}
+
+// MustString generates a random string, but panics on error.
+func MustString(n int, charset Charset) string {
+	str, err := String(n, charset)
+	if err != nil {
+		panic(err)
+	}
+	return str
 }
 
 func makeCharset(charset Charset) string {
 	var sb strings.Builder
-
 	if charset&Uppercase > 0 {
 		sb.WriteString("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	}
@@ -78,6 +98,5 @@ func makeCharset(charset Charset) string {
 	if charset&Digit > 0 {
 		sb.WriteString("0123456789")
 	}
-
 	return sb.String()
 }
